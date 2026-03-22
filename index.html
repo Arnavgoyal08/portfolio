@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arnav Goyal | Systems & Intelligence</title>
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #050505;
+            --panel: #0d0d0d;
+            --accent: #6c63ff;
+            --accent-glow: rgba(108, 99, 255, 0.2);
+            --text: #ffffff;
+            --muted: #666;
+            --border: rgba(255,255,255,0.08);
+            --success: #00ff88;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; overflow-x: hidden; }
+
+        .glow { position: fixed; width: 600px; height: 600px; background: radial-gradient(circle, var(--accent-glow), transparent 70%); pointer-events: none; transform: translate(-50%, -50%); z-index: 0; transition: 0.1s ease-out; }
+
+        nav { position: fixed; top: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 25px 8%; z-index: 1000; backdrop-filter: blur(10px); }
+        .logo { font-family: 'JetBrains Mono'; font-weight: 700; font-size: 0.9rem; color: var(--accent); }
+        nav a { color: #fff; margin-left: 30px; text-decoration: none; font-size: 0.75rem; font-family: 'JetBrains Mono'; opacity: 0.6; transition: 0.3s; }
+        nav a:hover { opacity: 1; color: var(--accent); }
+
+        .hero { height: 100vh; display: flex; align-items: center; justify-content: space-between; padding: 0 10%; position: relative; gap: 50px; }
+        .hero-text h1 { font-size: clamp(3.5rem, 8vw, 6rem); font-weight: 900; letter-spacing: -4px; line-height: 0.85; margin-bottom: 20px; }
+        
+        /* New System Status Dashboard */
+        .system-status { display: flex; gap: 30px; font-family: 'JetBrains Mono'; border-left: 2px solid var(--accent); padding-left: 20px; margin-top: 30px; }
+        .status-item span:first-child { display: block; font-size: 0.6rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+        .status-item span:last-child { font-size: 1rem; color: var(--text); }
+        #latency { color: var(--accent); }
+        #integrity { color: var(--success); }
+
+        .profile-container { width: 340px; height: 340px; flex-shrink: 0; border-radius: 50%; padding: 8px; background: linear-gradient(135deg, var(--accent), #00c2ff); box-shadow: 0 0 60px var(--accent-glow); overflow: hidden; }
+        .hero-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; background: #111; filter: grayscale(0.3) contrast(1.1); }
+
+        .ticker-wrap { background: var(--panel); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 15px 0; overflow: hidden; white-space: nowrap; }
+        .ticker { display: inline-block; animation: ticker 40s linear infinite; font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; }
+        .ticker span { margin-right: 50px; }
+        @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        .section { padding: 100px 10%; position: relative; }
+        .section-label { font-family: 'JetBrains Mono'; color: var(--accent); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 60px; display: block; letter-spacing: 2px; }
+
+        .project-item { display: flex; align-items: center; gap: 60px; margin-bottom: 120px; }
+        .project-item:nth-child(even) { flex-direction: row-reverse; }
+        
+        .visual-container { 
+            flex: 1.1; aspect-ratio: 16/9; background: #000; border-radius: 12px; 
+            overflow: hidden; position: relative; border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .screenshot { width: 100%; height: 100%; object-fit: contain; }
+
+        .project-content { flex: 0.9; }
+        .project-title { font-size: 3rem; letter-spacing: -2px; line-height: 1; margin-bottom: 15px; }
+        .project-desc { font-size: 1rem; color: var(--muted); margin-bottom: 25px; border-left: 2px solid var(--accent); padding-left: 15px; }
+
+        .prob-sol-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .ps-box { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
+        .ps-box b { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono'; color: var(--accent); font-size: 0.6rem; text-transform: uppercase; margin-bottom: 5px; }
+
+        .skills-matrix { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
+        .skill-card { 
+            background: var(--panel); border: 1px solid var(--border); padding: 40px; border-radius: 20px; 
+            position: relative; transition: 0.4s; overflow: hidden; 
+        }
+        .skill-card:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
+        .skill-card svg { width: 32px; height: 32px; color: var(--accent); margin-bottom: 20px; }
+        .skill-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+        .tag { padding: 4px 10px; background: rgba(108, 99, 255, 0.1); border: 1px solid rgba(108, 99, 255, 0.2); color: var(--accent); font-family: 'JetBrains Mono'; font-size: 0.7rem; border-radius: 4px; }
+
+        .btn-launch { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: #fff; color: #000; text-decoration: none; font-family: 'JetBrains Mono'; font-size: 0.75rem; font-weight: 700; border-radius: 4px; transition: 0.3s; margin-top: 10px; }
+        .btn-launch:hover { background: var(--accent); color: #fff; transform: translateY(-2px); }
+
+        footer { padding: 80px 10% 40px; border-top: 1px solid var(--border); }
+        .footer-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 40px; align-items: end; }
+        .footer-grid h2 { font-size: 4.5rem; letter-spacing: -4px; line-height: 0.9; }
+        
+        .contact-highlight { margin-top: 30px; }
+        .mail-box { 
+            display: inline-flex; align-items: center; gap: 15px; 
+            background: var(--panel); padding: 15px 25px; border-radius: 12px; 
+            border: 1px solid var(--accent); color: var(--text); 
+            text-decoration: none; font-family: 'JetBrains Mono'; font-weight: 700;
+            transition: 0.3s;
+        }
+        .mail-box:hover { background: var(--accent); box-shadow: 0 0 30px var(--accent-glow); }
+
+        .footer-links { text-align: right; font-family: 'JetBrains Mono'; }
+        .footer-links a { display: block; color: var(--muted); text-decoration: none; font-size: 1rem; margin-bottom: 12px; transition: 0.3s; }
+        .footer-links a:hover { color: var(--accent); }
+
+        @media (max-width: 1000px) {
+            .hero { flex-direction: column-reverse; text-align: center; height: auto; padding-top: 120px; }
+            .system-status { justify-content: center; border-left: none; border-top: 2px solid var(--accent); padding-left: 0; padding-top: 20px; }
+            .project-item, .project-item:nth-child(even) { flex-direction: column; }
+            .footer-grid { grid-template-columns: 1fr; text-align: center; }
+            .footer-links { text-align: center; margin-top: 40px; }
+            .footer-grid h2 { font-size: 3.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="glow" id="glow"></div>
+
+<nav>
+    <div class="logo" style="display: flex; align-items: center; gap: 10px;">
+        <span class="online-indicator"></span>
+        ARNAV_GOYAL.SYS
+    </div>
+    <div><a href="#work">WORK</a><a href="#skills">MATRIX</a><a href="#contact">CONTACT</a></div>
+</nav>
+
+<section class="hero">
+    <div class="hero-text">
+        <span class="section-label" style="margin-bottom: 10px;">System Architect // 2026</span>
+        <h1>AI & IoT<br>Systems.</h1>
+        <p style="max-width: 500px; color: var(--muted);">Designing intelligent hardware ecosystems to solve critical infrastructure gaps with precision logic.</p>
+        
+        <div class="system-status">
+            <div class="status-item">
+                <span>Core_Latency</span>
+                <span id="latency">14ms</span>
+            </div>
+            <div class="status-item">
+                <span>Active_Nodes</span>
+                <span>04</span>
+            </div>
+            <div class="status-item">
+                <span>Sys_Integrity</span>
+                <span id="integrity">NOMINAL</span>
+            </div>
+        </div>
+    </div>
+    <div class="profile-container">
+        <img src="Airbrush-image-extender.jpeg" alt="Arnav Goyal" class="hero-img">
+    </div>
+</section>
+
+<div class="ticker-wrap">
+    <div class="ticker">
+        <span>[01] DAV TINKFIESTA 1ST PRIZE</span>
+        <span>[02] SCHOOL SHARK TANK</span>
+        <span>[03] INNOVATION FAIR</span>
+        <span>[04] IOT SYSTEMS DEPLOYED: 04</span>
+        <span>[05] GLOBAL SUSTAINIBILITY AWARDS</span>
+        <span>[01] DAV TINKFIESTA 1ST PRIZE</span>
+    </div>
+</div>
+
+<section class="section" id="work">
+    <span class="section-label">Engineering Log // System Portfolio</span>
+
+    <div class="project-item">
+        <div class="visual-container">
+            <model-viewer id="nm-3d" src="namami_neer.glb" auto-rotate camera-controls shadow-intensity="1">
+                <div slot="poster" style="color: var(--accent); font-family: 'JetBrains Mono';">INITIALIZING_3D...</div>
+            </model-viewer>
+            <img id="nm-photo" src="namamineer.png" class="screenshot" style="display:none;" alt="Namami Neer">
+            <div style="position: absolute; bottom: 15px; right: 15px; display: flex; gap: 8px;">
+                <button class="btn-launch" style="margin:0; padding: 5px 12px; font-size: 0.6rem;" onclick="toggleView('nm', '3d')">3D</button>
+                <button class="btn-launch" style="margin:0; padding: 5px 12px; font-size: 0.6rem;" onclick="toggleView('nm', 'photo')">IMAGE</button>
+            </div>
+        </div>
+        <div class="project-content">
+            <div class="project-meta" style="font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--accent); margin-bottom: 10px;">01 // STAR PROJECT • DAV TINKFIESTA 1ST</div>
+            <h2 class="project-title">Namami Neer</h2>
+            <p class="project-desc">Industrial water conservation system using cloud-linked sensor arrays for automated management.</p>
+            <div class="prob-sol-grid">
+                <div class="ps-box"><b><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Problem</b><p style="font-size: 0.8rem; color: var(--muted);">Manual monitoring leading to massive water waste.</p></div>
+                <div class="ps-box"><b><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Solution</b><p style="font-size: 0.8rem; color: var(--muted);">IoT automation and real-time cloud tracking.</p></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="project-item">
+        <div class="visual-container">
+            <img src="styleswap.png" class="screenshot" alt="StyleSwap">
+        </div>
+        <div class="project-content">
+            <div class="project-meta" style="font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--accent); margin-bottom: 10px;">02 // WEB PLATFORM • GOOGLE CLOUD</div>
+            <h2 class="project-title">StyleSwap</h2>
+            <p class="project-desc">Circular economy platform for school essentials, connecting surplus to rural communities.</p>
+            <div class="prob-sol-grid">
+                <div class="ps-box"><b>Problem</b><p style="font-size: 0.8rem; color: var(--muted);">Resource waste in educational supplies.</p></div>
+                <div class="ps-box"><b>Solution</b><p style="font-size: 0.8rem; color: var(--muted);">Verified redistribution marketplace.</p></div>
+            </div>
+            <a href="https://arnavgoyal08.github.io/StyleSwap-website/" target="_blank" class="btn-launch">OPEN INTERFACE ↗</a>
+        </div>
+    </div>
+
+    <div class="project-item">
+        <div class="visual-container">
+            <img src="talktech.png" class="screenshot" alt="TalkTech">
+        </div>
+        <div class="project-content">
+            <div class="project-meta" style="font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--accent); margin-bottom: 10px;">03 // AI HARDWARE • NEURAL NETWORKS</div>
+            <h2 class="project-title">TalkTech</h2>
+            <p class="project-desc">Smart glove translating hand gestures into digital speech via ML classification.</p>
+            <div class="prob-sol-grid">
+                <div class="ps-box"><b>Problem</b><p style="font-size: 0.8rem; color: var(--muted);">Communication gap for non-verbal users.</p></div>
+                <div class="ps-box"><b>Solution</b><p style="font-size: 0.8rem; color: var(--muted);">Wearable sensor array with ML translation.</p></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="project-item">
+        <div class="visual-container">
+            <img src="khetcrate.png" class="screenshot" alt="KhetCrate">
+        </div>
+        <div class="project-content">
+            <div class="project-meta" style="font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--accent); margin-bottom: 10px;">04 // AGRI-TECH • BLYNK CLOUD</div>
+            <h2 class="project-title">KhetCrate</h2>
+            <p class="project-desc">Smart cold storage pod for real-time agricultural freshness scoring.</p>
+            <div class="prob-sol-grid">
+                <div class="ps-box"><b>Problem</b><p style="font-size: 0.8rem; color: var(--muted);">Post-harvest agricultural loss.</p></div>
+                <div class="ps-box"><b>Solution</b><p style="font-size: 0.8rem; color: var(--muted);">Atmospheric monitoring and health scores.</p></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="skills" class="section">
+    <span class="section-label">Technical Matrix</span>
+    <div class="skills-matrix">
+        <div class="skill-card">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg>
+            <h3>Hardware Architecture</h3>
+            <p style="color: var(--muted); font-size: 0.85rem;">Designing and prototyping embedded systems with low-latency telemetry.</p>
+            <div class="skill-tags">
+                <span class="tag">Arduino</span><span class="tag">ESP8266</span><span class="tag">Sensors</span><span class="tag">IoT Protocols</span>
+            </div>
+        </div>
+        <div class="skill-card">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <h3>Systems Software</h3>
+            <p style="color: var(--muted); font-size: 0.85rem;">Building robust backends and intelligence layers for hardware interaction.</p>
+            <div class="skill-tags">
+                <span class="tag">Python</span><span class="tag">JavaScript</span><span class="tag">C++</span><span class="tag">Teachable Machine</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer id="contact">
+    <div class="footer-grid">
+        <div>
+            <h2>Let's <span style="color: var(--accent);">build</span> the future.</h2>
+            <div class="contact-highlight">
+                <a href="mailto:arnavgoyalstudio@gmail.com" class="mail-box">
+                    arnavgoyalstudio@gmail.com
+                </a>
+            </div>
+        </div>
+        <div class="footer-links">
+            <p style="color: var(--accent); font-size: 0.6rem; letter-spacing: 2px; margin-bottom: 20px;">CONTACT_CHANNELS</p>
+            <a href="tel:+919643689363">+91 96436 89363</a>
+            <a href="https://www.linkedin.com/in/arnavgoyal-dps" target="_blank">LinkedIn ↗</a>
+            <p style="margin-top: 30px; font-size: 0.7rem; color: #333;">© 2026 ARNAV GOYAL. ALL SYSTEMS NOMINAL.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    const glow = document.getElementById('glow');
+    document.addEventListener('mousemove', e => {
+        glow.style.left = e.clientX + 'px'; glow.style.top = e.clientY + 'px';
+    });
+
+    // Simulating Live Telemetry for the Hero Section
+    setInterval(() => {
+        const latencyEl = document.getElementById('latency');
+        if(latencyEl) {
+            const randomLatency = Math.floor(Math.random() * (19 - 11 + 1) + 11);
+            latencyEl.innerText = randomLatency + 'ms';
+        }
+    }, 2500);
+
+    function toggleView(prefix, type) {
+        const model = document.getElementById(prefix + '-3d');
+        const photo = document.getElementById(prefix + '-photo');
+        if (type === '3d') {
+            model.style.display = 'block'; photo.style.display = 'none';
+        } else {
+            model.style.display = 'none'; photo.style.display = 'block';
+        }
+    }
+</script>
+
+</body>
+</html>
